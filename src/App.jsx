@@ -80,13 +80,17 @@ export default function App() {
     }
 
     const observer = new IntersectionObserver(
+		
       (entries) => {
+		console.log('entries', entries);
         if (entries[0].isIntersecting && !loading && page < totalPages) {
           handleLoadMore();
         }
       },
       { threshold: 0.1 }
     );
+
+	console.log('observer', observer);
 
     observer.observe(loadMoreRef.current);
     observerRef.current = observer;
