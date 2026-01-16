@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
 import SearchBar from "./components/SearchBar/SearchBar";
 import ImageGallery from "./components/ImageGallery/ImageGallery";
 import Loader from "./components/Loader/Loader";
 import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
+import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn.jsx";
 import ImageModal from "./components/ImageModal/ImageModal";
 import { fetchImages } from "./api/unsplash";
 
@@ -19,8 +20,6 @@ export default function App() {
   const [totalPages, setTotalPages] = useState(0);
   const [selectedImage, setSelectedImage] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const observerRef = useRef(null);
-  const loadMoreRef = useRef(null);
 
   useEffect(() => {
     if (query === "") {
@@ -74,34 +73,6 @@ export default function App() {
     }
   }, [page, totalPages, loading]);
 
-  useEffect(() => {
-    if (!loadMoreRef.current || !images.length || page >= totalPages) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-		
-      (entries) => {
-		console.log('entries', entries);
-        if (entries[0].isIntersecting && !loading && page < totalPages) {
-          handleLoadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-	console.log('observer', observer);
-
-    observer.observe(loadMoreRef.current);
-    observerRef.current = observer;
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, [images, loading, page, totalPages, handleLoadMore]);
-
   const handleImageClick = (image) => {
     setSelectedImage(image);
     setModalIsOpen(true);
@@ -125,8 +96,8 @@ export default function App() {
 
       {loading && <Loader />}
 
-      {images.length > 0 && page < totalPages && (
-        <div ref={loadMoreRef} style={{ height: "20px" }} />
+      {images.length > 0 && page < totalPages && !loading && (
+        <LoadMoreBtn onClick={handleLoadMore} loading={loading} />
       )}
 
       <ImageModal isOpen={modalIsOpen} image={selectedImage} onClose={closeModal} />

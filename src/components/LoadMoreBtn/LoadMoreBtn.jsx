@@ -4,9 +4,10 @@ export default function LoadMoreBtn({ onClick, loading }) {
   return (
     <div className={styles.container}>
       <button
+        type="button"
+        className={styles.button}
         onClick={onClick}
         disabled={loading}
-        className={styles.button}
       >
         {loading ? "Loading..." : "Load more"}
       </button>
